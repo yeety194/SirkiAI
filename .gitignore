@@ -8,3 +8,7 @@ venv/
 .vscode/
 .idea/
 Thumbs.db
+dist/
+build/
+*.spec.bak
+packaging/__pycache__/
