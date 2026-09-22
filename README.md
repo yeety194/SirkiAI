@@ -2,8 +2,6 @@
 
 SirkiAI is a Windows-first desktop AI helper built with **Python** and **PySide6**, with a pluggable **Hermes Agent** integration.
 
-The kickstart gives you a working chat window, conversation history, demo mode without credentials, permission-gated local tools, and optional text-to-speech.
-
 ## Quick start (Windows)
 
 ```powershell
@@ -26,41 +24,49 @@ python -m app
 
 Configure `HERMES_BASE_URL`, `HERMES_API_KEY`, and `HERMES_MODEL` in `.env`. Without those values, the app runs in **demo mode**.
 
-## What you get today
+## Feature flags
 
-- Desktop chat UI with async Hermes requests (UI stays responsive)
-- Conversation history + `/reset`
-- Hermes-compatible HTTP client (`/chat/completions` style)
-- Permission-gated starter tools: `/sysinfo`, `/open`, `/url`
-- Optional text-to-speech via `VOICE_ENABLED=true`
+| Flag | Default | Purpose |
+|---|---|---|
+| `MEMORY_ENABLED` | false | Opt-in SQLite memory |
+| `REMINDERS_ENABLED` | true | Local reminders |
+| `SCREEN_ENABLED` | true | Screenshots / ask-screen |
+| `SPEECH_ENABLED` | false | Push-to-talk |
+| `AUTOMATION_ENABLED` | false | Keyboard/mouse allowlist |
+| `TOOL_CALLING_ENABLED` | true | Hermes tool-calling bridge |
+| `VOICE_ENABLED` | false | TTS replies |
 
-## Starter commands
+## Commands
 
 | Command | Action |
 |---|---|
 | `/help` | Show commands |
-| `/sysinfo` | System info (asks permission) |
-| `/open [path]` | Open a local file/folder (asks permission) |
-| `/url [https://...]` | Open a URL (asks permission) |
-| `/clear` | Clear the chat view |
-| `/reset` | Reset conversation history |
+| `/sysinfo` | System info |
+| `/open [path]` | Open file/folder |
+| `/url [https://...]` | Open URL |
+| `/remember key=value` | Store memory |
+| `/recall [query]` | Search memories |
+| `/forget <id>` | Delete memory |
+| `/remind in 10m text` | Schedule reminder |
+| `/reminders` | List reminders |
+| `/cancel <id>` | Cancel reminder |
+| `/capture` | Screenshot |
+| `/ask-screen [q]` | Capture + ask Hermes |
+| `/type [text]` | Type text (automation) |
+| `/hotkey [ctrl+c]` | Hotkey (automation) |
+| `/click x,y` | Click (automation) |
+| `/clear` | Clear chat view |
+| `/reset` | Reset conversation |
 
-## Project layout
+Use the **Talk** button for push-to-talk when `SPEECH_ENABLED=true`.
+
+## Layout
 
 ```
-app/
-  app.py        # entrypoint
-  ui.py         # PySide6 chat window
-  hermes.py     # Hermes HTTP adapter + history
-  tools.py      # permission-gated desktop tools
-  voice.py      # optional TTS
-  worker.py     # background chat worker
-  config.py     # env settings
-docs/
-  architecture.md
-  roadmap.md
-tests/
-  test_core.py
+app/           application modules
+docs/          architecture, roadmap, packaging
+packaging/     PyInstaller spec + Windows build script
+tests/         unit smoke tests
 ```
 
 ## Tests
@@ -69,6 +75,6 @@ tests/
 python -m unittest discover -s tests -v
 ```
 
-## Next up
+## Packaging
 
-Screen understanding, speech recognition, keyboard/mouse automation, reminders, and persistent memory. See [docs/roadmap.md](docs/roadmap.md). Tool execution should remain permission-gated and allowlisted before anything is exposed to the model.
+See [docs/packaging.md](docs/packaging.md).
