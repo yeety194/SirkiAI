@@ -35,7 +35,7 @@ def _default_data_dir() -> Path:
 class Settings:
     app_name: str = os.getenv("APP_NAME", "SirkiAI")
     # auto | local | remote | demo
-    brain_mode: str = os.getenv("BRAIN_MODE", "auto")
+    brain_mode: str = os.getenv("BRAIN_MODE", "local")
     local_brain_url: str = os.getenv("LOCAL_BRAIN_URL", "http://127.0.0.1:11434/v1")
     local_brain_model: str = os.getenv("LOCAL_BRAIN_MODEL", "hermes3:3b")
     local_brain_api_key: str = os.getenv("LOCAL_BRAIN_API_KEY", "ollama")

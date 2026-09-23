@@ -35,6 +35,12 @@ User input / Talk / Capture
         → final assistant text → UI (+ optional Voice)
 ```
 
-## Packaging
+## Local brain
 
-See `docs/packaging.md` and `packaging/sirkiai.spec`.
+Sirki resolves a brain target via `app/brain.py`:
+
+1. `BRAIN_MODE=local` → Ollama at `LOCAL_BRAIN_URL` (default `http://127.0.0.1:11434/v1`)
+2. `remote` → `HERMES_BASE_URL` + API key
+3. `demo` → no model calls
+
+The Windows one-file build is `packaging/sirkiai.spec` → `Sirki.exe`, produced by GitHub Actions or `packaging/build_windows.ps1`.

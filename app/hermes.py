@@ -69,8 +69,8 @@ class HermesClient:
 
         if not self.configured:
             reply = (
-                "Demo mode: SirkiAI is running locally without Hermes credentials. "
-                "Set HERMES_BASE_URL and HERMES_API_KEY in .env to connect your agent. "
+                "Demo mode: no brain endpoint configured. "
+                "For a local Hermes brain, run scripts/start_local_brain and set BRAIN_MODE=local. "
                 "Use /help for memory, reminders, capture, speech, and automation commands."
             )
             self.messages.append({"role": "assistant", "content": reply})
