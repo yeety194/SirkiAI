@@ -1,14 +1,12 @@
 name: Build Sirki.exe
 
-on:
+# Quote "on" so strict YAML 1.1 parsers do not treat it as a boolean.
+"on":
   workflow_dispatch:
   push:
-    branches: [main, "cursor/**"]
-    paths:
-      - "app/**"
-      - "packaging/**"
-      - "requirements.txt"
-      - ".github/workflows/build-windows.yml"
+    branches:
+      - main
+      - "cursor/**"
 
 permissions:
   contents: read
