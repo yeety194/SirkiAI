@@ -1,15 +1,13 @@
 name: Build Sirki.exe
 
-# Quote "on" so strict YAML 1.1 parsers do not treat it as a boolean.
-"on":
+on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - "cursor/**"
+    branches: [main]
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   windows-exe:
@@ -39,12 +37,12 @@ jobs:
           Copy-Item .env.example release\.env
           Copy-Item scripts\start_local_brain.ps1 release\start_local_brain.ps1
           Copy-Item docs\local-brain.md release\README-local-brain.md
-          @"
+          Set-Content -Path release\HOW_TO_RUN.txt -Value @"
           SirkiAI Windows build
-          1. Double-click start_local_brain.ps1 once (installs/pulls Ollama Hermes).
+          1. Run start_local_brain.ps1 once (installs/pulls Ollama Hermes).
           2. Launch Sirki.exe
           3. Chat — BRAIN_MODE=local is already in .env
-          "@ | Set-Content release\HOW_TO_RUN.txt
+          "@
 
       - name: Upload Sirki.exe artifact
         uses: actions/upload-artifact@v4
