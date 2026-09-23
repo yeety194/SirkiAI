@@ -1,11 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for SirkiAI (Windows-first desktop build)."""
+"""One-file Windows build: dist/Sirki.exe"""
 
-from PyInstaller.utils.hooks import collect_all
+import os
+
+from PyInstaller.utils.hooks import collect_all, collect_data_files
 
 block_cipher = None
+root = os.path.abspath(os.path.join(SPECPATH, ".."))
 
-datas = []
+datas = collect_data_files("dotenv")
+datas += [(os.path.join(root, ".env.example"), ".")]
+
 binaries = []
 hiddenimports = [
     "PySide6",
@@ -16,6 +21,20 @@ hiddenimports = [
     "mss",
     "PIL",
     "pyautogui",
+    "app",
+    "app.app",
+    "app.brain",
+    "app.config",
+    "app.hermes",
+    "app.tools",
+    "app.ui",
+    "app.worker",
+    "app.memory",
+    "app.reminders",
+    "app.screen",
+    "app.speech",
+    "app.automation",
+    "app.voice",
 ]
 
 tmp_ret = collect_all("PySide6")
@@ -24,8 +43,8 @@ binaries += tmp_ret[1]
 hiddenimports += tmp_ret[2]
 
 a = Analysis(
-    ["../app/__main__.py"],
-    pathex=[],
+    [os.path.join(root, "app", "__main__.py")],
+    pathex=[root],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
@@ -44,28 +63,21 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
     [],
-    exclude_binaries=True,
-    name="SirkiAI",
+    name="Sirki",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-)
-
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name="SirkiAI",
 )

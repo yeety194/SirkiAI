@@ -68,6 +68,8 @@ class MainWindow(QMainWindow):
         screen: ScreenCapture,
         speech: SpeechRecognizer,
         voice: Voice,
+        brain_label: str = "Demo",
+        startup_note: str | None = None,
     ) -> None:
         super().__init__()
         self.client = client
@@ -89,8 +91,7 @@ class MainWindow(QMainWindow):
         brand.setObjectName("brand")
         brand.setFont(QFont("Segoe UI", 28, QFont.Weight.Bold))
 
-        flags = []
-        flags.append("Hermes" if client.configured else "Demo")
+        flags = [brain_label]
         if memory.enabled:
             flags.append("memory")
         if reminders.enabled:
@@ -104,8 +105,10 @@ class MainWindow(QMainWindow):
         self.log.setObjectName("log")
         self.log.setAcceptRichText(True)
         self._append_system(
-            "SirkiAI roadmap build ready. Try /help, /remember, /remind, /capture, or hold Talk."
+            "SirkiAI is ready. Local brain defaults to Ollama Hermes. Try /help, /remind, /capture, or Talk."
         )
+        if startup_note:
+            self._append_system(startup_note)
 
         self.input = QLineEdit()
         self.input.setObjectName("prompt")

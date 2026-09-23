@@ -5,6 +5,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from .automation import DesktopAutomation
+from .brain import ollama_reachable, resolve_brain
 from .config import settings
 from .hermes import HermesClient
 from .memory import MemoryStore
@@ -43,11 +44,12 @@ def main() -> None:
         tools_enabled=settings.tools_enabled,
     )
 
+    brain = resolve_brain(settings)
     client = HermesClient(
-        settings.hermes_base_url,
-        settings.hermes_api_key,
-        settings.hermes_model,
-        settings.hermes_api_endpoint,
+        brain.base_url,
+        brain.api_key,
+        brain.model,
+        brain.endpoint,
         timeout_seconds=settings.request_timeout_seconds,
         system_prompt=SYSTEM_PROMPT,
         tools=tools,
@@ -59,6 +61,14 @@ def main() -> None:
         if context:
             client.inject_system_note(context)
 
+    startup_note = None
+    if brain.mode == "local" and not ollama_reachable(brain.base_url):
+        startup_note = (
+            "Local brain is selected but Ollama is not reachable at "
+            f"{brain.base_url}. Run scripts/start_local_brain.ps1 (Windows) "
+            "or scripts/start_local_brain.sh, then retry."
+        )
+
     window = MainWindow(
         client=client,
         title=settings.app_name,
@@ -68,6 +78,8 @@ def main() -> None:
         screen=screen,
         speech=speech,
         voice=voice,
+        brain_label=brain.label,
+        startup_note=startup_note,
     )
     window.show()
     sys.exit(application.exec())

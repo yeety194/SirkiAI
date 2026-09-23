@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from app.automation import DesktopAutomation
+from app.brain import resolve_brain
 from app.hermes import HermesClient
 from app.memory import MemoryStore
 from app.reminders import ReminderStore, parse_reminder
@@ -16,7 +17,45 @@ from app.screen import CaptureResult, ScreenCapture
 from app.tools import DesktopTools, tool_args_from_call
 
 
+def _settings(**overrides):
+    base = {
+        "brain_mode": "auto",
+        "local_brain_url": "http://127.0.0.1:11434/v1",
+        "local_brain_model": "hermes3:3b",
+        "local_brain_api_key": "ollama",
+        "hermes_base_url": "",
+        "hermes_api_key": "",
+        "hermes_model": "hermes-3",
+        "hermes_api_endpoint": "/chat/completions",
+    }
+    base.update(overrides)
+    return type("S", (), base)()
+
+
+class BrainResolveTests(unittest.TestCase):
+    def test_local_mode(self) -> None:
+        target = resolve_brain(_settings(brain_mode="local"))
+        self.assertEqual(target.mode, "local")
+        self.assertEqual(target.model, "hermes3:3b")
+        self.assertTrue(target.base_url.endswith("/v1"))
+
+    def test_remote_requires_key(self) -> None:
+        target = resolve_brain(
+            _settings(brain_mode="remote", hermes_base_url="https://example.com/v1", hermes_api_key="")
+        )
+        self.assertEqual(target.mode, "demo")
+
+    def test_demo_mode(self) -> None:
+        target = resolve_brain(
+            _settings(brain_mode="demo", hermes_base_url="https://example.com/v1", hermes_api_key="key")
+        )
+        self.assertEqual(target.mode, "demo")
+
+
 class HermesClientTests(unittest.TestCase):
+    def test_local_url_without_key_is_configured(self) -> None:
+        client = HermesClient("http://127.0.0.1:11434/v1", "", "hermes3:3b", "/chat/completions")
+        self.assertTrue(client.configured)
     def test_demo_mode_without_credentials(self) -> None:
         client = HermesClient("", "", "hermes-3", "/chat/completions")
         reply = client.chat("hello")

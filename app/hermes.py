@@ -49,7 +49,8 @@ class HermesClient:
 
     @property
     def configured(self) -> bool:
-        return bool(self.base_url and self.api_key)
+        # Local Ollama only needs a base URL; remote Hermes usually also needs a key.
+        return bool(self.base_url)
 
     def reset(self) -> None:
         system = [m for m in self.messages if m.get("role") == "system"]
@@ -85,7 +86,10 @@ class HermesClient:
 
                 response = requests.post(
                     url,
-                    headers={"Authorization": f"Bearer {self.api_key}"},
+                    headers={
+                        "Authorization": f"Bearer {self.api_key or 'ollama'}",
+                        "Content-Type": "application/json",
+                    },
                     json=payload,
                     timeout=self.timeout_seconds,
                 )

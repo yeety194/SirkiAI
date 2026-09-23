@@ -1,45 +1,34 @@
-# Packaging SirkiAI for Windows
+# Packaging Sirki.exe (Windows)
 
-This brief covers a PyInstaller one-folder (recommended) or one-file build.
+## One-file exe (recommended)
 
-## Prerequisites
-
-- Windows 10/11
-- Python 3.11+
-- `pip install -r requirements.txt pyinstaller`
-
-## One-folder build (easier to debug)
-
-From the repo root:
+On a Windows machine:
 
 ```powershell
-py -3.11 -m PyInstaller packaging/sirkiai.spec
+.\packaging\build_windows.ps1
 ```
 
 Output:
 
 ```
-dist/SirkiAI/SirkiAI.exe
+dist\Sirki.exe
 ```
 
-Copy `.env.example` to the same folder as `SirkiAI.exe` and rename to `.env`.
+Or rely on GitHub Actions: workflow **Build Sirki.exe** uploads a `Sirki-windows` artifact containing:
 
-## One-file build
+- `Sirki.exe`
+- `.env` (local brain defaults)
+- `start_local_brain.ps1`
+- `HOW_TO_RUN.txt`
 
-```powershell
-py -3.11 -m PyInstaller --noconfirm --windowed --name SirkiAI --collect-all PySide6 app/__main__.py
-```
+## Local brain + exe
+
+1. Run `start_local_brain.ps1` once
+2. Launch `Sirki.exe`
+3. Confirm the subtitle shows `Local brain (hermes3:3b)`
 
 ## Notes
 
-- Keep `TOOLS_ENABLED`, `AUTOMATION_ENABLED`, `MEMORY_ENABLED`, and `SPEECH_ENABLED` explicit in `.env`.
-- Antivirus tools may flag automation/PyInstaller binaries; code-sign when you distribute.
-- Speech and TTS need OS audio devices and optional native backends.
-- Do not bake API keys into the binary; always load `.env` at runtime.
-
-## Smoke check after build
-
-1. Launch `SirkiAI.exe`
-2. Confirm demo mode without Hermes keys
-3. Run `/help`, `/sysinfo`, `/remind in 1m test`
-4. Enable Hermes credentials and send one chat turn
+- The exe is the desktop shell. The brain runs separately in Ollama.
+- Do not bake secrets into the binary; load `.env` beside `Sirki.exe`.
+- Antivirus may flag PyInstaller + automation deps; code-sign for distribution.
