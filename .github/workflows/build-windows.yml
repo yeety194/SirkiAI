@@ -5,12 +5,16 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-  actions: write
-
 jobs:
+  # Cheap canary — proves Actions can schedule anything at all.
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Canary
+        run: echo "Sirki Actions canary OK"
+
   windows-exe:
+    needs: canary
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -37,12 +41,7 @@ jobs:
           Copy-Item .env.example release\.env
           Copy-Item scripts\start_local_brain.ps1 release\start_local_brain.ps1
           Copy-Item docs\local-brain.md release\README-local-brain.md
-          Set-Content -Path release\HOW_TO_RUN.txt -Value @"
-          SirkiAI Windows build
-          1. Run start_local_brain.ps1 once (installs/pulls Ollama Hermes).
-          2. Launch Sirki.exe
-          3. Chat — BRAIN_MODE=local is already in .env
-          "@
+          Set-Content -Path release\HOW_TO_RUN.txt -Value "1) Run start_local_brain.ps1  2) Launch Sirki.exe"
 
       - name: Upload Sirki.exe artifact
         uses: actions/upload-artifact@v4
